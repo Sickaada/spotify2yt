@@ -3,10 +3,6 @@
   "version": "4.4.0",
   "description": "Spotify to Youtube and vice versa",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/lxieyang/chrome-extension-boilerplate-react.git"
-  },
   "scripts": {
     "build": "node utils/build.js",
     "start": "node utils/webserver.js",
