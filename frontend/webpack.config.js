@@ -6,6 +6,7 @@ var webpack = require('webpack'),
   HtmlWebpackPlugin = require('html-webpack-plugin'),
   TerserPlugin = require('terser-webpack-plugin');
 var { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const dotenv = require('dotenv')
 
 const ASSET_PATH = process.env.ASSET_PATH || '/';
 
@@ -208,5 +209,7 @@ if (env.NODE_ENV === 'development') {
     ],
   };
 }
+
+
 
 module.exports = options;

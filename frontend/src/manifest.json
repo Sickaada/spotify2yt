@@ -9,6 +9,16 @@
     "default_popup": "popup.html",
     "default_icon": "icon-34.png"
   },
+  "permissions": [
+    "identity"
+  ],
+  "oauth2": {
+    "client_id" : "282543743919-9c80nbn3ttk39bb0269atlrqk3b9vbfe.apps.googleusercontent.com",
+    "scopes" : [
+      "https://www.googleapis.com/auth/youtube",
+      "https://www.googleapis.com/auth/youtube.readonly"
+    ]
+  },
   "icons": {
     "128": "icon-128.png"
   },
