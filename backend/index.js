@@ -17,8 +17,8 @@ const corsOptions = {
 app.use(express.json())
 app.use(cors());
 dotenv.config();
-
 app.get("/", (req, res) => {
+
     res.status(200).json({
         message : "sab chnaga si"
     })

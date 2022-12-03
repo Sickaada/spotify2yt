@@ -8,6 +8,7 @@ import SpotifyWebApi from 'spotify-web-api-node';
 import { MemoryRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import RouteUnauthenticated from '../../components/RouteUnauth';
 import RouteAuthenticated from '../../components/RouteAuth';
+import Dashboard from '../../components/Dashboard';
 
 const Popup = () => {
   const [accessToken, setAccessToken] = useState(
@@ -31,7 +32,7 @@ const Popup = () => {
       console.log('google token', token);
       localStorage.setItem('youtube-access-token', token);
     });
-    location.reload()
+    location.reload();
   };
 
   const spotifyApi = new SpotifyWebApi({
@@ -49,10 +50,6 @@ const Popup = () => {
   useEffect(() => {
     if (accessToken) {
       spotifyApi.setAccessToken(accessToken);
-      spotifyApi
-        .getMe()
-        .then((res) => console.log(res.data))
-        .catch((err) => console.log(err));
     }
   }, [accessToken]);
 
@@ -64,6 +61,10 @@ const Popup = () => {
         })
         .then((res) => {
           localStorage.setItem('spotify-token', res.data.access_token);
+          localStorage.setItem(
+            'spotify-token-timestamp',
+            JSON.stringify(new Date())
+          );
           localStorage.setItem('spotify-refresh-token', res.data.refresh_token);
           localStorage.setItem(
             'spotify-expiresIn',
@@ -82,28 +83,46 @@ const Popup = () => {
     }
   }, []);
 
+  const refreshTokenFunc = () => {
+    axios
+      .post('http://localhost:4000/api/auth/refresh/spotify', {
+        refreshToken,
+      })
+      .then((res) => {
+        console.log({ res });
+        localStorage.setItem('spotify-token', res.data.access_token);
+        localStorage.setItem(
+          'spotify-token-timestamp',
+          JSON.stringify(new Date())
+        );
+        localStorage.setItem(
+          'spotify-expiresIn',
+          res.data.expires_in.toString()
+        );
+        setAccessToken(res.data.access_token);
+        setExpiresIn(res.data.expires_in);
+      })
+      .catch((err) => {
+        console.log(err);
+        window.location =
+          'chrome-extension://pnlllofibghnggabgfagediogplbncga/popup.html';
+      });
+  };
+
+  useEffect(() => {
+    const spotifyTokenTimeStamp = new Date(JSON.parse(localStorage.getItem(
+      'spotify-token-timestamp'
+    )));
+    const timeElapsed = (new Date() - spotifyTokenTimeStamp)/1000 /* in seconds*/
+    if (accessToken && refreshToken && expiresIn && timeElapsed > (expiresIn - 60)) {
+      refreshTokenFunc()
+    }
+  }, [])
+
   useEffect(() => {
     if (refreshToken && expiresIn) {
       const interval = setInterval(() => {
-        axios
-          .post('http://localhost:4000/api/auth/refresh/spotify', {
-            refreshToken,
-          })
-          .then((res) => {
-            console.log({ res });
-            localStorage.setItem('spotify-token', res.data.access_token);
-            localStorage.setItem(
-              'spotify-expiresIn',
-              res.data.expires_in.toString()
-            );
-            setAccessToken(res.data.access_token);
-            setExpiresIn(res.data.expires_in);
-          })
-          .catch((err) => {
-            console.log(err);
-            window.location =
-              'chrome-extension://pnlllofibghnggabgfagediogplbncga/popup.html';
-          });
+        refreshTokenFunc()
       }, (expiresIn - 60) * 1000);
 
       return () => clearInterval(interval);
@@ -113,8 +132,8 @@ const Popup = () => {
   const logout = () => {
     localStorage.removeItem('spotify-token');
     localStorage.removeItem('youtube-access-token');
-    location.reload()
-  }
+    location.reload();
+  };
 
   const Login = () => {
     return (
@@ -127,15 +146,6 @@ const Popup = () => {
     );
   };
 
-  const Dashboard = () => {
-    return (
-      <div>
-        <h1>Hello gays, today i have a list of top 5 playlists</h1>
-        <button onClick={logout}>Logout</button>
-      </div>
-    );
-  };
-
   return (
     <div>
       <Router>
@@ -144,10 +154,7 @@ const Popup = () => {
             <Login/>
           </Route> */}
           <RouteUnauthenticated component={Login} exact path="/" />
-          <RouteAuthenticated
-            component={Dashboard}
-            path="/dashboard"
-          />
+          <RouteAuthenticated component={Dashboard} path="/dashboard" />
         </Switch>
       </Router>
     </div>
