@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import logo from '../../assets/img/logo.svg';
-import Greetings from '../../containers/Greetings/Greetings';
 import './Popup.css';
 import axios from 'axios';
-import { Buffer } from 'buffer';
 import SpotifyWebApi from 'spotify-web-api-node';
 import { MemoryRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import RouteUnauthenticated from '../../components/RouteUnauth';
@@ -29,17 +26,16 @@ const Popup = () => {
 
   const getToken = () => {
     chrome.identity.getAuthToken({ interactive: true }, function (token) {
-      console.log('google token', token);
       localStorage.setItem('youtube-access-token', token);
+      location.reload();
     });
-    location.reload();
   };
 
   const spotifyApi = new SpotifyWebApi({
     redirectUri:
       'chrome-extension://pnlllofibghnggabgfagediogplbncga/popup.html',
-    clientId: '18ce45390c5a4ed0a7a949940a919d36',
-    clientSecret: 'fc211a18c03e458e95224c9aaa333a40',
+    clientId: process.env.SPOTIFY_CLIENT_ID,
+    clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
   });
 
   const params = new Proxy(new URLSearchParams(window.location.search), {
@@ -89,7 +85,6 @@ const Popup = () => {
         refreshToken,
       })
       .then((res) => {
-        console.log({ res });
         localStorage.setItem('spotify-token', res.data.access_token);
         localStorage.setItem(
           'spotify-token-timestamp',
@@ -110,38 +105,60 @@ const Popup = () => {
   };
 
   useEffect(() => {
-    const spotifyTokenTimeStamp = new Date(JSON.parse(localStorage.getItem(
-      'spotify-token-timestamp'
-    )));
-    const timeElapsed = (new Date() - spotifyTokenTimeStamp)/1000 /* in seconds*/
-    if (accessToken && refreshToken && expiresIn && timeElapsed > (expiresIn - 60)) {
-      refreshTokenFunc()
+    const spotifyTokenTimeStamp = new Date(
+      JSON.parse(localStorage.getItem('spotify-token-timestamp'))
+    );
+    const timeElapsed =
+      (new Date() - spotifyTokenTimeStamp) / 1000; /* in seconds*/
+    if (
+      accessToken &&
+      refreshToken &&
+      expiresIn &&
+      timeElapsed > expiresIn - 60
+    ) {
+      refreshTokenFunc();
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (refreshToken && expiresIn) {
       const interval = setInterval(() => {
-        refreshTokenFunc()
+        refreshTokenFunc();
       }, (expiresIn - 60) * 1000);
 
       return () => clearInterval(interval);
     }
   }, [refreshToken, expiresIn]);
 
-  const logout = () => {
-    localStorage.removeItem('spotify-token');
-    localStorage.removeItem('youtube-access-token');
-    location.reload();
-  };
-
   const Login = () => {
     return (
       <div className="App">
-        <a href="http://localhost:4000/api/auth/login/spotify">
-          <button>Spotify se login karein</button>
-        </a>
-        <button onClick={getToken}>youtube se login karein</button>
+        <h1
+          style={{
+            marginTop: 50,
+            marginBottom: 30,
+            color: 'rgba(255,255,255, 0.8)',
+          }}
+        >
+          Spotify2YT
+        </h1>
+        <div className="btn-container">
+          <a href="http://localhost:4000/api/auth/login/spotify">
+            <button
+              className="login-btn"
+              style={{ background: '#1DB954', color: 'white' }}
+            >
+              {accessToken? 'Spotify Connected' : 'Connect Spotify'}
+            </button>
+          </a>
+          <button
+            className="login-btn"
+            style={{ background: '#FF0000', color: 'white' }}
+            onClick={getToken}
+          >
+            {ytAccessToken? 'Youtube Connected' : 'Connect Youtube'}
+          </button>
+        </div>
       </div>
     );
   };
@@ -150,9 +167,6 @@ const Popup = () => {
     <div>
       <Router>
         <Switch>
-          {/* <Route exact path='/'>
-            <Login/>
-          </Route> */}
           <RouteUnauthenticated component={Login} exact path="/" />
           <RouteAuthenticated component={Dashboard} path="/dashboard" />
         </Switch>

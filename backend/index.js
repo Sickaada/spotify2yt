@@ -3,7 +3,6 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const PORT = process.env.PORT || 4000
 const spotifyAuthRoute = require('./routes/auth/spotifyAuth')
-const youtubeAuthRoute = require('./routes/auth/youtubeAuth')
 
 const app = express();
 
@@ -25,5 +24,4 @@ app.get("/", (req, res) => {
 })
 
 app.use("/api/auth", spotifyAuthRoute)
-app.use("/api/auth", youtubeAuthRoute)
 app.listen(PORT, () => console.log(`server running at port ${PORT}`))

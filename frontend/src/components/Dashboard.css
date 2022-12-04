@@ -1,0 +1,16 @@
+.convert-button {
+    height : 30px;
+    border-radius: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border: none;
+    background: #a4508b;
+    cursor: pointer;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: .1s ease-in-out;
+}
+
+.convert-button:hover {
+    background: #b91c8a;
+}

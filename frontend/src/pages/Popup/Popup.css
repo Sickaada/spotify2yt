@@ -5,9 +5,23 @@
   left: 0px;
   right: 0px;
   text-align: center;
-  height: 100%;
-  padding: 10px;
-  background-color: #282c34;
+}
+
+.btn-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px
+}
+
+.login-btn {
+  width: 200px;
+  height: 50px;
+  border-radius: 25px;
+  border: none;
+  margin: 0 auto;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .App-logo {
@@ -43,3 +57,4 @@
     transform: rotate(360deg);
   }
 }
+

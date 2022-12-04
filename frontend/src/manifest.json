@@ -13,7 +13,7 @@
     "identity"
   ],
   "oauth2": {
-    "client_id" : "282543743919-9c80nbn3ttk39bb0269atlrqk3b9vbfe.apps.googleusercontent.com",
+    "client_id" : "904706058759-lq76t91e50feqmvmlpukul0un331hqmv.apps.googleusercontent.com",
     "scopes" : [
       "https://www.googleapis.com/auth/youtube",
       "https://www.googleapis.com/auth/youtube.readonly"
